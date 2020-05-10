@@ -11,10 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.hcl.app.business.domain.APIResponse;
+import org.hcl.app.business.domain.Sale;
 import org.hcl.app.business.domain.Sales;
 import org.hcl.app.business.service.OrderService;
 import org.junit.Before;
@@ -27,7 +29,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
+import org.mockito.ArgumentMatchers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,6 +46,18 @@ public class OrderWebControllerTest {
 
 	private Sales sales = null;
 	private final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	
+	private List<Sale> createSaleItems() {
+		List<Sale> saleItems = new ArrayList<Sale>();
+		Sale sale = new Sale();
+		sale.setProductName("Product 1");
+		sale.setSaleId(1L);
+		sale.setTotalAmount(10.00);
+		sale.setTotalQty(10);
+		saleItems.add(sale);
+		
+		return saleItems;
+	}
 
 	@Before
 	public void init() throws ParseException {
@@ -55,7 +69,6 @@ public class OrderWebControllerTest {
 	@Test
 	public void testGetOrder() throws Exception {
 		APIResponse apiResponse = new APIResponse();
-		sales.setSalesId(1L);
 		apiResponse.setResponse(sales);
 		BDDMockito.given(orderService.getOrderByNumber(1L)).willReturn(apiResponse);
 		mockMvc.perform(get("/api/orders?orderid=1"))
@@ -67,21 +80,21 @@ public class OrderWebControllerTest {
 	public void testCreateOrder() throws JsonProcessingException, Exception {
 		APIResponse apiResponse = new APIResponse();
 		apiResponse.setResponse(1L);
-		BDDMockito.given(orderService.createOrder(sales)).willReturn(apiResponse);
+		sales.setSales(createSaleItems());
+		BDDMockito.given(orderService.createOrder(ArgumentMatchers.any())).willReturn(apiResponse);
 		mockMvc.perform(
-				post("/api/orders")
-				.content(new ObjectMapper().writeValueAsString(sales))
-				.characterEncoding("UTF-8")
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-			)
-			.andExpect(status().isOk());
+			post("/api/orders")
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.content(new ObjectMapper().writeValueAsString(sales))
+		)
+		.andExpect(status().isOk())
+		.andExpect(content().string(containsString("\"response\":1")));
 	}
 	
 	@Test
 	public void testDeleteOrder() throws Exception {
 		APIResponse apiResponse = new APIResponse();
-		sales.setSalesId(1L);
 		apiResponse.setResponse(1L);
 		BDDMockito.given(orderService.deleteOrder(1L)).willReturn(apiResponse);
 		mockMvc.perform(delete("/api/orders?orderid=1"))
@@ -92,23 +105,22 @@ public class OrderWebControllerTest {
 	@Test
 	public void testUpdateOrder() throws Exception {
 		APIResponse apiResponse = new APIResponse();
-		sales.setSalesId(1L);
 		apiResponse.setResponse(1L);
-		BDDMockito.given(orderService.updateOrder(sales)).willReturn(apiResponse);
+		BDDMockito.given(orderService.updateOrder(ArgumentMatchers.any())).willReturn(apiResponse);
 		mockMvc.perform(
-				put("/api/orders")
-				.content(new ObjectMapper().writeValueAsString(sales))
-				.characterEncoding("UTF-8")
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-			)
-			.andExpect(status().isOk());
+			put("/api/orders")
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.content(new ObjectMapper().writeValueAsString(sales))
+		)
+		.andExpect(status().isOk())
+		.andExpect(content().string(containsString("\"response\":1")));
 	}
 	
 	@Test
 	public void testGetSalesByDate() throws Exception {
 		APIResponse apiResponse = new APIResponse();
-		sales.setSalesId(1L);
+		sales.setSales(createSaleItems());
 		List<Sales> salesList = Arrays.asList(new Sales[] { sales });
 		apiResponse.setResponse(salesList);
 		BDDMockito.given(orderService.getOrdersByDate("2020-01-01")).willReturn(apiResponse);
