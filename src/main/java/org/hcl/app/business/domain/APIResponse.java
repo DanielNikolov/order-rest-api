@@ -1,8 +1,15 @@
 package org.hcl.app.business.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "Order/Sales operation result")
 public class APIResponse {
+	@ApiModelProperty(notes = "Contains result of operation: order/sales/order id")
 	private Object response;
+	@ApiModelProperty(notes = "Error flag - true if error, false otherwise")
 	private boolean error;
+	@ApiModelProperty(notes = "Error message")
 	private String message;
 
 	public APIResponse() {

@@ -1,9 +1,17 @@
 package org.hcl.app.business.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "Sale Item Data")
 public class Sale {
+	@ApiModelProperty(notes = "Sale Item ID")
 	private Long saleId = null;
+	@ApiModelProperty(notes = "Sale Item Product Name")
 	private String productName = null;
-	private Integer totalQty = -1;
+	@ApiModelProperty(notes = "Sale Item Total Quantity")
+	private Integer totalQty = null;
+	@ApiModelProperty(notes = "Sale Item Total Price")
 	private Double totalAmount = null;
 
 	public Long getSaleId() {
