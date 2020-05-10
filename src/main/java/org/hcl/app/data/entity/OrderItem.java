@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -17,7 +18,8 @@ public class OrderItem {
 
 	@Id
 	@Column(name = "ORDERITEM_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name= "ORDERITEM_SEQUENCE", sequenceName = "ORDERITEM_SEQUENCE_ID", initialValue=1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "ORDERITEM_SEQUENCE")
 	private long orderItemId;
 	
 	@Column(name = "ORDER_NUMBER")

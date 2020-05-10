@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -19,13 +19,16 @@ public class Order {
 	
 	@Id
 	@Column(columnDefinition = "ORDER_NUMBER")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name= "ORDER_SEQUENCE", sequenceName = "ORDER_SEQUENCE_ID", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "ORDER_SEQUENCE")
 	private long orderNumber;
 	
 	@Column(name = "ORDER_DATE")
 	private Date orderDate;
 	
-	@OneToMany(mappedBy = "orderNumber", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OneToMany(mappedBy = "orderNumber", 
+			cascade = {CascadeType.MERGE, CascadeType.REMOVE}, 
+			orphanRemoval = true)
 	private List<OrderItem> orderItems;
 
 	public long getOrderNumber() {
